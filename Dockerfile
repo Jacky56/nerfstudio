@@ -54,7 +54,16 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.31.3/cmake-3.31.3
     && /tmp/cmake-install.sh --skip-license --prefix=/opt/cmake-3.31.3 \
     && rm /tmp/cmake-install.sh \
     && ln -s /opt/cmake-3.31.3/bin/* /usr/local/bin
-    
+
+RUN wget http://ceres-solver.org/ceres-solver-2.2.0.tar.gz \
+    && tar zxf ceres-solver-2.2.0.tar.gz \
+    && mkdir ceres-bin \
+    && cd ceres-bin \
+    && cmake ../ceres-solver-2.2.0 "-DCMAKE_INSTALL_PREFIX=/build/ceres" "-DCMAKE_CUDA_ARCHITECTURES=${CUDA_ARCHITECTURES}" \
+    && make -j3 \
+    && make install \
+    cd ~
+
 # Build and install GLOMAP.
 RUN git clone https://github.com/colmap/glomap.git && \
     cd glomap && \
@@ -145,6 +154,7 @@ RUN apt-get update && \
 # Copy packages from builder stage.
 COPY --from=builder /build/colmap/ /usr/local/
 COPY --from=builder /build/glomap/ /usr/local/
+COPY --from=builder /build/ceres/ /usr/local/
 COPY --from=builder /usr/local/lib/python3.10/dist-packages/ /usr/local/lib/python3.10/dist-packages/
 COPY --from=builder /usr/local/bin/ns* /usr/local/bin/
 
