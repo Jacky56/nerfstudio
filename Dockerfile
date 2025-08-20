@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1
 ARG UBUNTU_VERSION=22.04
-ARG NVIDIA_CUDA_VERSION=11.8.0
+ARG NVIDIA_CUDA_VERSION=12.9.1
 # CUDA architectures, required by Colmap and tiny-cuda-nn. Use >= 8.0 for faster TCNN.
 ARG CUDA_ARCHITECTURES="90;89;86;80;75;70;61"
 ARG NERFSTUDIO_VERSION=""
@@ -70,7 +70,7 @@ RUN git clone https://github.com/colmap/glomap.git && \
 # Build and install COLMAP.
 RUN git clone https://github.com/colmap/colmap.git && \
     cd colmap && \
-    git checkout "3.12.4" && \
+    git checkout "3.11.1" && \
     mkdir build && \
     cd build && \
     mkdir -p /build && \
