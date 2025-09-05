@@ -117,7 +117,8 @@ RUN chmod -R go=u /usr/local/lib/python3.10 && \
 #
 # Docker runtime stage.
 #
-FROM nvidia/cuda:${NVIDIA_CUDA_VERSION}-devel-ubuntu${UBUNTU_VERSION} as runtime
+# FROM nvidia/cuda:${NVIDIA_CUDA_VERSION}-devel-ubuntu${UBUNTU_VERSION} as runtime
+FROM nvidia/cuda:${NVIDIA_CUDA_VERSION}-runtime-ubuntu${UBUNTU_VERSION} as runtime
 ARG CUDA_ARCHITECTURES
 ARG NVIDIA_CUDA_VERSION
 ARG UBUNTU_VERSION
