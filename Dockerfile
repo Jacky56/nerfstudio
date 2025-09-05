@@ -55,19 +55,19 @@ RUN wget https://github.com/Kitware/CMake/releases/download/v3.31.3/cmake-3.31.3
     && rm /tmp/cmake-install.sh \
     && ln -s /opt/cmake-3.31.3/bin/* /usr/local/bin
 
-RUN wget http://ceres-solver.org/ceres-solver-2.2.0.tar.gz \
-    && tar zxf ceres-solver-2.2.0.tar.gz \
-    && mkdir ceres-bin \
-    && cd ceres-bin \
-    && cmake ../ceres-solver-2.2.0 "-DCMAKE_INSTALL_PREFIX=/build/ceres" "-DCMAKE_CUDA_ARCHITECTURES=${CUDA_ARCHITECTURES}" \
-    && make -j3 \
-    && make install \
-    cd ~
+# RUN wget http://ceres-solver.org/ceres-solver-2.2.0.tar.gz \
+#     && tar zxf ceres-solver-2.2.0.tar.gz \
+#     && mkdir ceres-bin \
+#     && cd ceres-bin \
+#     && cmake ../ceres-solver-2.2.0 "-DCMAKE_INSTALL_PREFIX=/build/ceres" "-DCMAKE_CUDA_ARCHITECTURES=${CUDA_ARCHITECTURES}" \
+#     && make -j3 \
+#     && make install \
+#     cd ~
 
 # Build and install GLOMAP.
 RUN git clone https://github.com/colmap/glomap.git && \
     cd glomap && \
-    git checkout "1.0.0" && \
+    git checkout "1.1.0" && \
     mkdir build && \
     cd build && \
     mkdir -p /build && \
@@ -79,7 +79,7 @@ RUN git clone https://github.com/colmap/glomap.git && \
 # Build and install COLMAP.
 RUN git clone https://github.com/colmap/colmap.git && \
     cd colmap && \
-    git checkout "3.11.1" && \
+    git checkout "3.12.5" && \
     mkdir build && \
     cd build && \
     mkdir -p /build && \
@@ -91,11 +91,11 @@ RUN git clone https://github.com/colmap/colmap.git && \
 # Upgrade pip and install dependencies.
 # pip install torch==2.2.2 torchvision==0.17.2 --index-url https://download.pytorch.org/whl/cu118 && \
 RUN pip install --no-cache-dir --upgrade pip 'setuptools<70.0.0' && \
-    pip install --no-cache-dir torch==2.1.2+cu118 torchvision==0.16.2+cu118 'numpy<2.0.0' --extra-index-url https://download.pytorch.org/whl/cu118 && \
+    pip install --no-cache-dir torch==2.8.0+cu129 torchvision==0.23.0+cu129 'numpy<2.0.0' --extra-index-url https://download.pytorch.org/whl/cu129 && \
     git clone --branch master --recursive https://github.com/cvg/Hierarchical-Localization.git /opt/hloc && \
     cd /opt/hloc && git checkout v1.4 && python3.10 -m pip install --no-cache-dir . && cd ~ && \
     TCNN_CUDA_ARCHITECTURES="${CUDA_ARCHITECTURES}" pip install --no-cache-dir "git+https://github.com/NVlabs/tiny-cuda-nn.git@b3473c81396fe927293bdfd5a6be32df8769927c#subdirectory=bindings/torch" && \
-    pip install --no-cache-dir pycolmap==0.6.1 pyceres==2.1 omegaconf==2.3.0
+    pip install --no-cache-dir pycolmap==0.6.1 pyceres==2.5 omegaconf==2.3.0
 
 # Install gsplat and nerfstudio.
 # NOTE: both are installed jointly in order to prevent docker cache with latest
@@ -106,8 +106,7 @@ RUN pip install --no-cache-dir --upgrade pip 'setuptools<70.0.0' && \
 COPY --from=source /tmp/nerfstudio/ /tmp/nerfstudio
 RUN export TORCH_CUDA_ARCH_LIST="$(echo "$CUDA_ARCHITECTURES" | tr ';' '\n' | awk '$0 > 70 {print substr($0,1,1)"."substr($0,2)}' | tr '\n' ' ' | sed 's/ $//')" && \
     export MAX_JOBS=4 && \
-    GSPLAT_VERSION="$(sed -n 's/.*gsplat==\s*\([^," '"'"']*\).*/\1/p' /tmp/nerfstudio/pyproject.toml)" && \
-    pip install --no-cache-dir git+https://github.com/nerfstudio-project/gsplat.git@v${GSPLAT_VERSION} && \
+    pip install --no-cache-dir git+https://github.com/nerfstudio-project/gsplat.git@v1.5.3 && \
     pip install --no-cache-dir /tmp/nerfstudio 'numpy<2.0.0' && \
     rm -rf /tmp/nerfstudio
 
@@ -154,7 +153,7 @@ RUN apt-get update && \
 # Copy packages from builder stage.
 COPY --from=builder /build/colmap/ /usr/local/
 COPY --from=builder /build/glomap/ /usr/local/
-COPY --from=builder /build/ceres/ /usr/local/
+# COPY --from=builder /build/ceres/ /usr/local/
 COPY --from=builder /usr/local/lib/python3.10/dist-packages/ /usr/local/lib/python3.10/dist-packages/
 COPY --from=builder /usr/local/bin/ns* /usr/local/bin/
 
