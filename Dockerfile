@@ -79,7 +79,7 @@ RUN git clone https://github.com/colmap/glomap.git && \
 # Build and install COLMAP.
 RUN git clone https://github.com/colmap/colmap.git && \
     cd colmap && \
-    git checkout "3.12.5" && \
+    git checkout "3.11.1" && \
     mkdir build && \
     cd build && \
     mkdir -p /build && \
@@ -103,12 +103,13 @@ RUN pip install --no-cache-dir --upgrade pip 'setuptools<70.0.0' && \
 #
 # We set MAX_JOBS to reduce resource usage for GH actions:
 # - https://github.com/nerfstudio-project/gsplat/blob/db444b904976d6e01e79b736dd89a1070b0ee1d0/setup.py#L13-L23
-COPY --from=source /tmp/nerfstudio/ /tmp/nerfstudio
-RUN export TORCH_CUDA_ARCH_LIST="$(echo "$CUDA_ARCHITECTURES" | tr ';' '\n' | awk '$0 > 70 {print substr($0,1,1)"."substr($0,2)}' | tr '\n' ' ' | sed 's/ $//')" && \
-    export MAX_JOBS=4 && \
-    pip install --no-cache-dir git+https://github.com/nerfstudio-project/gsplat.git@v1.5.3 && \
-    pip install --no-cache-dir /tmp/nerfstudio 'numpy<2.0.0' && \
-    rm -rf /tmp/nerfstudio
+# COPY --from=source /tmp/nerfstudio/ /tmp/nerfstudio
+# RUN export TORCH_CUDA_ARCH_LIST="$(echo "$CUDA_ARCHITECTURES" | tr ';' '\n' | awk '$0 > 70 {print substr($0,1,1)"."substr($0,2)}' | tr '\n' ' ' | sed 's/ $//')" && \
+#     export MAX_JOBS=4 && \
+#     pip install --no-cache-dir git+https://github.com/nerfstudio-project/gsplat.git@v1.5.3 && \
+#     pip install --no-cache-dir /tmp/nerfstudio 'numpy<2.0.0' && \
+#     rm -rf /tmp/nerfstudio
+RUN pip install git+https://github.com/nerfstudio-project/gsplat.git@v1.5.3
 
 # Fix permissions
 RUN chmod -R go=u /usr/local/lib/python3.10 && \
