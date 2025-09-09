@@ -79,7 +79,7 @@ RUN git clone https://github.com/colmap/glomap.git && \
 # Build and install COLMAP.
 RUN git clone https://github.com/colmap/colmap.git && \
     cd colmap && \
-    git checkout "3.11.1" && \
+    git checkout "3.12.5" && \
     mkdir build && \
     cd build && \
     mkdir -p /build && \
